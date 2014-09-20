@@ -4,13 +4,11 @@ package eu.softelo.unit;
  * Created by dabl on 2014-09-18.
  */
 
+import eu.softelo.Birthday;
 import eu.softelo.BirthdayCalendar;
 import eu.softelo.DefaultBirthdayCalendar;
-import junit.framework.TestCase;
-
-import org.apache.cxf.frontend.ClientProxyFactoryBean;
-import org.apache.cxf.frontend.ServerFactoryBean;
-import org.apache.cxf.aegis.databinding.AegisDatabinding;
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.junit.Test;
 
 import java.text.ParseException;
@@ -26,13 +24,11 @@ public class ServiceTest {
     private static final String BIRTDAY = "19-02-1984";
 
     static {
-        ServerFactoryBean serverFactoryBean = new ServerFactoryBean();
-        serverFactoryBean.getServiceFactory().setDataBinding(new AegisDatabinding());
+        JaxWsServerFactoryBean serverFactoryBean = new JaxWsServerFactoryBean();
         serverFactoryBean.setServiceClass(BirthdayCalendar.class);
         serverFactoryBean.setAddress(ADDRESS);
         serverFactoryBean.setServiceBean(new DefaultBirthdayCalendar());
         serverFactoryBean.create();
-
     }
 
     @Test
@@ -41,7 +37,7 @@ public class ServiceTest {
         SimpleDateFormat sdf = new SimpleDateFormat(DD_MM_YYYY);
 
         bc.addBirthday(DAMIAN, sdf.parse(BIRTDAY));
-        BirthdayCalendar.Birthday[] b = bc.getBirthdaysInMonth(2);
+        Birthday[] b = bc.getBirthdaysInMonth(2);
 
         assertEquals(1, b.length);
         assertEquals(DAMIAN, b[0].getName());
@@ -49,9 +45,8 @@ public class ServiceTest {
     }
 
     protected BirthdayCalendar newBirthdayClient() {
-        ClientProxyFactoryBean clientProxyFactoryBean = new ClientProxyFactoryBean();
+        JaxWsProxyFactoryBean  clientProxyFactoryBean = new JaxWsProxyFactoryBean();
         clientProxyFactoryBean.setServiceClass(BirthdayCalendar.class);
-        clientProxyFactoryBean.getServiceFactory().setDataBinding(new AegisDatabinding());
         clientProxyFactoryBean.setAddress(ADDRESS);
         return (BirthdayCalendar) clientProxyFactoryBean.create();
     }
